@@ -7,5 +7,6 @@ router.post('/register', isNotAuthenticated, authController.register);
 router.post('/login', isNotAuthenticated, authController.login);
 router.get('/logout', authController.logout);
 router.post('/change-password', isAuthenticated, authController.changePassword);
+router.post('/forgot-password', isNotAuthenticated, authController.forgotPassword);
 
 module.exports = router;

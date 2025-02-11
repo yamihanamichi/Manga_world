@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const db = require('../config/database');
-const { sendAdminWelcomeEmail, sendUserWelcomeEmail } = require('./emailController');
+const { sendAdminWelcomeEmail, sendUserWelcomeEmail, sendPasswordResetEmail } = require('./emailController');
 
 exports.register = async (req, res) => {
     try {
@@ -150,6 +151,39 @@ exports.changePassword = async (req, res) => {
         res.json({ message: 'Mot de passe modifié avec succès' });
     } catch (error) {
         console.error('Erreur lors du changement de mot de passe:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Vérifier si l'email existe
+        const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+        if (users.length === 0) {
+            return res.status(404).json({ error: 'Aucun compte associé à cet email' });
+        }
+
+        const user = users[0];
+
+        // Générer un token unique
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const tokenExpiry = new Date();
+        tokenExpiry.setHours(tokenExpiry.getHours() + 1); // Token valide 1 heure
+
+        // Sauvegarder le token dans la base de données
+        await db.execute(
+            'UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?',
+            [resetToken, tokenExpiry, user.id]
+        );
+
+        // Envoyer l'email de réinitialisation
+        await sendPasswordResetEmail(user.email, resetToken);
+
+        res.json({ message: 'Email de réinitialisation envoyé' });
+    } catch (error) {
+        console.error('Erreur lors de la réinitialisation du mot de passe:', error);
         res.status(500).json({ error: 'Erreur serveur' });
     }
 };

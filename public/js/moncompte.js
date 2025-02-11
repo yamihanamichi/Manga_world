@@ -113,3 +113,35 @@ async function submitPasswordChange() {
         alert('Une erreur est survenue lors de la modification du mot de passe.');
     }
 }
+
+async function submitForgotPassword() {
+    const email = document.getElementById('resetEmail').value.trim();
+
+    if (!email) {
+        alert('Veuillez saisir votre email.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/auth/forgot-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Un email de réinitialisation vous a été envoyé.');
+            document.getElementById('forgotPasswordForm').reset();
+            bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal')).hide();
+        } else {
+            alert(data.error || 'Une erreur est survenue.');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        alert('Une erreur est survenue lors de l\'envoi de la demande.');
+    }
+}
