@@ -1,0 +1,250 @@
+<%- include('../../layout/header', {title: 'Dashboard Admin', page: 'admin'}) %>
+
+<main class="container py-4">
+    <h1 class="text-white mb-4">Dashboard Administrateur</h1>
+    
+    <div class="row">
+        <!-- Section Statistiques Manga -->
+        <div class="col-12 mb-4">
+            <div class="card bg-dark text-white">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Statistiques des Mangas</h2>
+                </div>
+                <div class="card-body">
+                    <div id="globalStats" class="mb-4">
+                        <h3 class="h6 mb-3">Statistiques Globales</h3>
+                        <div class="row">
+                            <!-- Les stats globales seront chargées ici -->
+                        </div>
+                    </div>
+                    <div id="topMangasList">
+                        <h3 class="h6 mb-3">Top 10 des Mangas les Plus Populaires</h3>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Manga</th>
+                                        <th>Total Ajouts</th>
+                                        <th>En Lecture</th>
+                                        <th>Terminé</th>
+                                        <th>Planifié</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="topMangasTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Chargement...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Commentaires -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark text-white">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Gestion des Commentaires</h2>
+                </div>
+                <div class="card-body">
+                    <div id="commentsList" class="list-group">
+                        <!-- Les commentaires seront chargés ici -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section Utilisateurs -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark text-white">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Gestion des Utilisateurs</h2>
+                </div>
+                <div class="card-body">
+                    <div id="usersList" class="list-group">
+                        <!-- Les utilisateurs seront chargés ici -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadComments();
+    loadUsers();
+    loadMangaStats();
+});
+
+async function loadMangaStats() {
+    try {
+        const response = await fetch('/admin/manga-stats');
+        if (!response.ok) throw new Error('Erreur lors de la récupération des statistiques');
+        
+        const data = await response.json();
+        
+        // Afficher les statistiques globales
+        const globalStatsContainer = document.getElementById('globalStats').querySelector('.row');
+        const stats = data.globalStats || {
+            total_users_with_lists: 0,
+            unique_mangas: 0,
+            total_entries: 0
+        };
+
+        globalStatsContainer.innerHTML = `
+            <div class="col-md-4 mb-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h6>Utilisateurs Actifs</h6>
+                        <h3>${stats.total_users_with_lists}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h6>Mangas Uniques</h6>
+                        <h3>${stats.unique_mangas}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h6>Total Entrées</h6>
+                        <h3>${stats.total_entries}</h3>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Afficher le top des mangas
+        const topMangasBody = document.getElementById('topMangasTableBody');
+        if (!data.topMangas || data.topMangas.length === 0) {
+            topMangasBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center">Aucun manga dans les listes pour le moment</td>
+                </tr>
+            `;
+            return;
+        }
+
+        topMangasBody.innerHTML = data.topMangas.map(manga => `
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <img src="${manga.image_url}" alt="${manga.title}" style="width: 50px; height: 70px; object-fit: cover; margin-right: 10px;">
+                        <span>${manga.title}</span>
+                    </div>
+                </td>
+                <td>${manga.total_adds || 0}</td>
+                <td>${manga.reading_count || 0}</td>
+                <td>${manga.completed_count || 0}</td>
+                <td>${manga.plan_count || 0}</td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('topMangasTableBody').innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-danger">
+                    Une erreur est survenue lors du chargement des statistiques
+                </td>
+            </tr>
+        `;
+    }
+}
+
+async function loadComments() {
+    try {
+        const response = await fetch('/admin/comments/all');
+        const comments = await response.json();
+        
+        const container = document.getElementById('commentsList');
+        container.innerHTML = comments.map(comment => `
+            <div class="list-group-item bg-dark text-white border-secondary mb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-1">${comment.username}</h6>
+                    <small>${new Date(comment.created_at).toLocaleString()}</small>
+                </div>
+                <p class="mb-1">${comment.comment}</p>
+                <button class="btn btn-danger btn-sm mt-2" onclick="deleteComment(${comment.id})">
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+            </div>
+        `).join('') || '<p class="text-center">Aucun commentaire</p>';
+    } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('commentsList').innerHTML = '<p class="text-center text-danger">Erreur lors du chargement des commentaires</p>';
+    }
+}
+
+async function loadUsers() {
+    try {
+        const response = await fetch('/admin/users');
+        const users = await response.json();
+        
+        const container = document.getElementById('usersList');
+        container.innerHTML = users.map(user => `
+            <div class="list-group-item bg-dark text-white border-secondary mb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-1">${user.username}</h6>
+                    <span class="badge ${user.is_active ? 'bg-success' : 'bg-danger'}">
+                        ${user.is_active ? 'Actif' : 'Banni'}
+                    </span>
+                </div>
+                <p class="mb-1">Email: ${user.email}</p>
+                <button class="btn ${user.is_active ? 'btn-danger' : 'btn-success'} btn-sm mt-2" 
+                        onclick="toggleUserStatus(${user.id}, ${user.is_active})"
+                        ${user.role === 'admin' ? 'disabled' : ''}>
+                    <i class="fas ${user.is_active ? 'fa-ban' : 'fa-user-check'}"></i>
+                    ${user.is_active ? 'Bannir' : 'Débannir'}
+                </button>
+            </div>
+        `).join('') || '<p class="text-center">Aucun utilisateur</p>';
+    } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('usersList').innerHTML = '<p class="text-center text-danger">Erreur lors du chargement des utilisateurs</p>';
+    }
+}
+
+async function deleteComment(commentId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
+        try {
+            const response = await fetch(`/admin/comments/${commentId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                loadComments();
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la suppression du commentaire');
+        }
+    }
+}
+
+async function toggleUserStatus(userId, currentStatus) {
+    const action = currentStatus ? 'bannir' : 'débannir';
+    if (confirm(`Êtes-vous sûr de vouloir ${action} cet utilisateur ?`)) {
+        try {
+            const response = await fetch(`/admin/users/${userId}/toggle-status`, {
+                method: 'PUT'
+            });
+            
+            if (response.ok) {
+                loadUsers();
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la modification du statut de l\'utilisateur');
+        }
+    }
+}
+</script>
+
+<%- include('../../layout/footer') %>

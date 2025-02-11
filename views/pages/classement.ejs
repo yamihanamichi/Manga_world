@@ -1,0 +1,50 @@
+<%- include('../layout/header', {title: 'Classement', page: 'classement'}) %>
+
+<main class="container-fluid p-0 bg-secondary-color">
+    <div class="container py-4">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex flex-wrap gap-3 align-items-center">
+                    <button type="button" class="btn btn-primary active" data-filter="bypopularity">
+                        <i class="fas fa-fire"></i> Populaires
+                    </button>
+                    
+                    <select class="form-select w-auto" id="genreFilter">
+                        <option value="">Sélectionner un genre</option>
+                        <!-- Les genres seront chargés dynamiquement -->
+                    </select>
+
+                    <div class="input-group w-auto">
+                        <input type="text" class="form-control" placeholder="Rechercher un manga" id="searchInput">
+                        <button class="btn btn-primary" type="button" id="searchBtn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="mangaContainer">
+            <!-- Les cards de manga seront générées ici dynamiquement -->
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 d-flex justify-content-center align-items-center">
+                <button class="btn btn-primary me-2" id="prevPageBtn">
+                    <i class="fas fa-chevron-left"></i> Précédent
+                </button>
+                <span id="currentPage" class="mx-3">Page 1</span>
+                <button class="btn btn-primary" id="nextPageBtn">
+                    Suivant <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    window.userId = <%= user ? user.id : 'null' %>;
+    window.userRole = '<%= user ? user.role : "guest" %>';
+</script>
+
+<%- include('../layout/footer', {scripts: ['classement.js']}) %>

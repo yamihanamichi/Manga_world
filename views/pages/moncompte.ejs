@@ -1,0 +1,113 @@
+<%- include('../layout/header', {title: 'Mon Compte', page: 'moncompte'}) %>
+
+<main class="container-fluid p-0 account-form-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <% if (user) { %>
+                    <div class="card account-form-card">
+                        <div class="card-header text-white text-center">
+                            <h2>Mon Profil</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <i class="fas fa-user-circle fa-5x text-white"></i>
+                            </div>
+                            <div class="text-white">
+                                <p><strong>Pseudo:</strong> <%= user.username %></p>
+                                <p><strong>Rôle:</strong> <%= user.role === 'admin' ? 'Administrateur' : 'Utilisateur' %></p>
+                            </div>
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                    <i class="fas fa-key"></i> Changer mon mot de passe
+                                </button>
+                                <a href="/auth/logout" class="btn btn-danger">
+                                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="card account-form-card">
+                        <div class="card-header text-white text-center">
+                            <h2 id="formTitle">Connexion</h2>
+                        </div>
+                        <div class="card-body">
+                            <% if (messages && messages.error && messages.error.length > 0) { %>
+                                <div class="alert alert-danger">
+                                    <%= messages.error %>
+                                </div>
+                            <% } %>
+                            <% if (messages && messages.success && messages.success.length > 0) { %>
+                                <div class="alert alert-success">
+                                    <%= messages.success %>
+                                </div>
+                            <% } %>
+                            <form id="accountForm" action="/auth/login" method="POST">
+                                <div id="emailGroup" class="mb-3" style="display: none;">
+                                    <label for="email" class="form-label text-white">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="username" class="form-label text-white">Pseudo</label>
+                                    <input type="text" class="form-control" id="username" name="username" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label text-white">Mot de passe</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                                <div id="confirmPasswordGroup" class="mb-3" style="display: none;">
+                                    <label for="confirmPassword" class="form-label text-white">Confirmer le mot de passe</label>
+                                    <input type="password" class="form-control" id="confirmPassword">
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary" id="submitBtn">Se connecter</button>
+                                </div>
+                            </form>
+                            <div class="text-center mt-3">
+                                <p class="text-white">
+                                    Vous n'avez pas de compte ? 
+                                    <a href="#" id="toggleForm" class="text-accent">Créer un compte</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal de changement de mot de passe -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-white" id="changePasswordModalLabel">Changer mon mot de passe</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="passwordChangeForm">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label text-white">Mot de passe actuel</label>
+                        <input type="password" class="form-control bg-dark text-white" id="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label text-white">Nouveau mot de passe</label>
+                        <input type="password" class="form-control bg-dark text-white" id="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmNewPassword" class="form-label text-white">Confirmer le nouveau mot de passe</label>
+                        <input type="password" class="form-control bg-dark text-white" id="confirmNewPassword" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="submitPasswordChange()">Changer le mot de passe</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../layout/footer', {scripts: ['moncompte.js']}) %>

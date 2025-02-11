@@ -1,0 +1,67 @@
+<%- include('../../layout/header', {title: 'Modération des commentaires', page: 'admin'}) %>
+
+<main class="container py-4">
+    <h1 class="text-white mb-4">Modération des commentaires</h1>
+    
+    <div class="card bg-dark text-white">
+        <div class="card-body">
+            <div id="pendingComments" class="list-group">
+                <!-- Les commentaires en attente seront chargés ici -->
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+async function loadPendingComments() {
+    try {
+        const response = await fetch('/comments/pending');
+        const comments = await response.json();
+        
+        const container = document.getElementById('pendingComments');
+        container.innerHTML = comments.map(comment => `
+            <div class="list-group-item bg-dark text-white border-secondary mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-1">${comment.username}</h5>
+                    <small>${new Date(comment.created_at).toLocaleString()}</small>
+                </div>
+                <p class="mb-1">${comment.comment}</p>
+                <div class="d-flex justify-content-end mt-2">
+                    <button class="btn btn-success btn-sm me-2" onclick="approveComment(${comment.id})">
+                        Approuver
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteComment(${comment.id})">
+                        Supprimer
+                    </button>
+                </div>
+            </div>
+        `).join('') || '<p class="text-center">Aucun commentaire en attente</p>';
+    } catch (error) {
+        console.error('Erreur:', error);
+    }
+}
+
+async function approveComment(commentId) {
+    try {
+        await fetch(`/comments/approve/${commentId}`, { method: 'PUT' });
+        loadPendingComments();
+    } catch (error) {
+        console.error('Erreur:', error);
+    }
+}
+
+async function deleteComment(commentId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
+        try {
+            await fetch(`/comments/${commentId}`, { method: 'DELETE' });
+            loadPendingComments();
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    }
+}
+
+loadPendingComments();
+</script>
+
+<%- include('../../layout/footer') %>
