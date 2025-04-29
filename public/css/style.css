@@ -1,23 +1,12 @@
 :root {
     --primary-color: #004E51;
     --secondary-color: #008085;
-    --accent-color: #ffffff;
+    --accent-color: #FF6B6B;
     --background-color: #1a1a1a;
     --text-color: #ffffff;
     --fire-color1: rgb(18, 153, 113);
     --fire-color2: rgb(18, 153, 113);
     --fire-color3: rgb(18, 153, 113);
-}
-
-body, html {
-    margin: 0;
-    padding: 0;
-    background-color: var(--background-color);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    font-family: "Press Start 2P", system-ui, sans-serif;
-    color: var(--text-color);
 }
 
 /* Assurer que tous les textes sont blancs */
@@ -31,6 +20,17 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     opacity: 0.7;
 }
 
+body, html {
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: "Press Start 2P", system-ui, sans-serif;
+    color: var(--text-color);
+}
+
 .manga-header {
     background-color: rgba(0, 78, 81, 0.95);
     backdrop-filter: blur(10px);
@@ -40,21 +40,24 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     z-index: 1000;
 }
 
+.footer {
+    background-color: rgba(0, 78, 81, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+    color: var(--text-color);
+    padding: 1rem 0;
+    position: relative;
+    z-index: 1000;
+}
+
 .logo {
-    width: 60px;
-    height: 60px;
+    width: 100px; /* Augmenté de 60px à 80px */
+    height: 100px; /* Augmenté de 60px à 80px */
     object-fit: cover;
     border-radius: 50%;
-    transition: transform 0.3s ease;
-    animation: fire-animation 2s infinite, float-animation 3s ease-in-out infinite;
     filter: drop-shadow(0 0 10px var(--fire-color1))
            drop-shadow(0 0 20px var(--fire-color2))
            drop-shadow(0 0 30px var(--fire-color3));
-}
-
-/* Le reste du CSS reste identique */
-.logo:hover {
-    transform: rotate(360deg);
 }
 
 .nav-link {
@@ -71,12 +74,47 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     left: 0;
     width: 0;
     height: 2px;
-    background-color: var(--accent-color);
+    background-color: var(--text-color);
     transition: width 0.3s ease;
 }
 
 .nav-link:hover::after {
     width: 100%;
+}
+
+/* Système de particules amélioré */
+.particles-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    background: var(--fire-color1);
+    border-radius: 50%;
+    filter: blur(2px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+@keyframes particle-animation {
+    0% {
+        transform: rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.8;
+    }
+    80% {
+        opacity: 0.5;
+    }
+    100% {
+        transform: rotate(calc(360deg * var(--rotation-direction))) translateX(calc(100px * var(--rotation-direction))) scale(0);
+        opacity: 0;
+    }
 }
 
 /* Styles de la page d'accueil */
@@ -113,7 +151,7 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     text-shadow: 0 0 10px var(--fire-color1),
                  0 0 20px var(--fire-color2),
                  0 0 30px var(--fire-color3);
-    animation: fire-animation 2s infinite, float-animation 3s ease-in-out infinite;
+    animation: fire-animation 2s infinite;
 }
 
 .fire-letter:nth-child(even) {
@@ -130,6 +168,40 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     opacity: 0;
     transform: translateY(20px);
     animation: fade-in 1s ease-out forwards 1s;
+    margin-bottom: 3rem;
+}
+
+.gon-container {
+    position: relative;
+    width: 350px;
+    height: 500px;
+    margin: 0 auto;
+    animation: float 6s ease-in-out infinite;
+    margin-top: 2rem;
+}
+
+.gon-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 15px rgba(18, 153, 113, 0.6));
+    transition: filter 0.3s ease;
+}
+
+.gon-container:hover .gon-image {
+    filter: drop-shadow(0 0 25px rgba(18, 153, 113, 0.9));
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-25px) rotate(5deg);
+    }
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
 }
 
 /* Styles des cartes manga */
@@ -140,6 +212,7 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
+    cursor: pointer;
 }
 
 .manga-card:hover {
@@ -149,6 +222,7 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
 
 .manga-card img {
     height: 300px;
+    width: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
 }
@@ -254,7 +328,6 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     animation: popupFadeIn 0.3s ease-out;
 }
 
-/* Nouveau style pour le bouton de fermeture */
 .close-popup {
     position: absolute;
     top: 15px;
@@ -280,7 +353,6 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Style pour le contenu scrollable de la popup */
 .popup-body {
     padding: 20px;
     max-height: calc(90vh - 60px);
@@ -289,7 +361,6 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     scrollbar-color: var(--primary-color) rgba(255, 255, 255, 0.1);
 }
 
-/* Personnalisation de la scrollbar */
 .popup-body::-webkit-scrollbar {
     width: 6px;
 }
@@ -318,15 +389,6 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     }
 }
 
-@keyframes float-animation {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
 @keyframes fade-in {
     from {
         opacity: 0;
@@ -349,39 +411,23 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     }
 }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0.1;
-    }
-    50% {
-        transform: scale(1.5);
-        opacity: 0.2;
-    }
+/* Styles de recherche */
+#searchInput {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    backdrop-filter: blur(5px);
 }
 
-/* Effets de lumière */
-.title-container::before,
-.title-container::after {
-    content: '';
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, var(--fire-color1), transparent 70%);
-    border-radius: 50%;
-    opacity: 0.1;
-    animation: pulse 4s infinite;
+#searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.7);
 }
 
-.title-container::before {
-    left: -100px;
-    top: -100px;
-}
-
-.title-container::after {
-    right: -100px;
-    bottom: -100px;
-    animation-delay: 2s;
+#searchInput:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.25);
+    color: white;
 }
 
 /* Styles responsifs */
@@ -406,23 +452,4 @@ p, h1, h2, h3, h4, h5, h6, span, div, label, input, select, textarea {
     .popup-body {
         padding: 1rem;
     }
-}
-
-/* Styles de recherche */
-#searchInput {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    backdrop-filter: blur(5px);
-}
-
-#searchInput::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-#searchInput:focus {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.25);
-    color: white;
 }

@@ -1,6 +1,7 @@
 <%- include('../layout/header', {title: 'Accueil', page: 'home'}) %>
 
 <main class="home-container">
+    <div class="particles-container" id="particles"></div>
     <div class="title-container">
         <h1 class="main-title">
             <span class="fire-letter">M</span>
@@ -15,7 +16,57 @@
             <span class="fire-letter">d</span>
         </h1>
         <div class="subtitle">Explorez l'univers des mangas</div>
+        <div class="gon-container">
+            <img src="/images/jump.png" alt="Gon pêchant" class="gon-image">
+        </div>
     </div>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('particles');
+    const particleCount = 100;
+
+    function createParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Position aléatoire sur toute la page
+        const x = Math.random() * container.clientWidth;
+        const y = Math.random() * container.clientHeight;
+        
+        // Taille aléatoire
+        const size = 4 + Math.random() * 8;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        
+        // Opacité aléatoire
+        particle.style.opacity = 0.3 + Math.random() * 0.7;
+        
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        
+        // Animation personnalisée avec durée, délai et direction aléatoires
+        const duration = 3 + Math.random() * 4;
+        const delay = Math.random() * 2;
+        const direction = Math.random() > 0.5 ? 1 : -1;
+        particle.style.setProperty('--rotation-direction', direction);
+        particle.style.animation = `particle-animation ${duration}s linear ${delay}s infinite`;
+        
+        container.appendChild(particle);
+        
+        // Recréer la particule après un certain temps pour maintenir le nombre
+        setTimeout(() => {
+            particle.remove();
+            createParticle();
+        }, (duration + delay) * 1000);
+    }
+    
+    // Créer les particules initiales avec un délai entre chaque création
+    for (let i = 0; i < particleCount; i++) {
+        setTimeout(createParticle, i * 50);
+    }
+});
+</script>
 
 <%- include('../layout/footer') %>

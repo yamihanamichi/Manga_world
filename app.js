@@ -5,6 +5,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const { isAuthenticated, isAdmin } = require('./middleware/auth');
 const { createAdminAccount } = require('./controllers/authController');
+const open = require('open');
 require('dotenv').config();
 
 const app = express();
@@ -83,5 +84,11 @@ app.get('/moncompte', (req, res) => {
 
 // Démarrage du serveur
 app.listen(port, () => {
-    console.log(`Serveur démarré sur http://localhost:${port}`);
+    console.log('\x1b[36m%s\x1b[0m', '=== Manga World ===');
+    console.log('\x1b[32m%s\x1b[0m', `✓ Serveur démarré sur http://localhost:${port}`);
+    console.log('\x1b[33m%s\x1b[0m', '→ Ouverture de votre navigateur...');
+    console.log('\x1b[90m%s\x1b[0m', 'Pour arrêter le serveur, fermez cette fenêtre.\n');
+    
+    // Ouvre le navigateur par défaut
+    open(`http://localhost:${port}`);
 });
